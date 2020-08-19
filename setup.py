@@ -48,7 +48,7 @@ EXT = Extension(
 
 setuptools.setup(
     name="tf_pose",
-    version="0.1.0",
+    version="0.2.0",
     description="Deep Pose Estimation implemented using Tensorflow with Custom Architectures for fast inference.",
     install_requires=REQUIRED_PACKAGES,
     dependency_links=DEPENDENCY_LINKS,
