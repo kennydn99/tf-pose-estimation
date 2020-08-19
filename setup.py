@@ -48,7 +48,7 @@ EXT = Extension(
 
 setuptools.setup(
     name="tf_pose",
-    version="0.3.0",
+    version="0.4.0",
     description="Deep Pose Estimation implemented using Tensorflow with Custom Architectures for fast inference.",
     long_description="This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is "
                      "restrict to tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
