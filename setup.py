@@ -53,6 +53,7 @@ setuptools.setup(
     long_description="This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is "
                      "restrict to tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
                      "sort out",
+    long_description_content_type="text/markdown",
     install_requires=REQUIRED_PACKAGES,
     dependency_links=DEPENDENCY_LINKS,
     url="https://github.com/ildoonet/tf-pose-estimation/",
