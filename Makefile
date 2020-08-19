@@ -76,7 +76,7 @@ bumpversion:
 	git push origin master --tags
 
 release: ## package and upload a release
-	pipenv run s3pypi --bucket pipy.detalytics.com --private
+	pipenv run  twine upload --repository pypi dist/*
 
 config: clean ## install the package to the active Python's site-packages
 	source .env; pipenv install --dev

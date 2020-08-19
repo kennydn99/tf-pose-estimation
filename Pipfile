@@ -16,6 +16,7 @@ s3pypi = "*"
 pytype = "*"
 importlib-metadata = "*"
 pytest-deadfixtures = "*"
+twine="*"
 
 [packages]
 argparse = "*"
