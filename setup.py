@@ -52,7 +52,7 @@ setuptools.setup(
     description="Deep Pose Estimation implemented using Tensorflow with Custom Architectures for fast inference.",
     long_description="This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is "
                      "to restrict tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
-                     "sorted out",
+                     "sorted out.",
     long_description_content_type="text/markdown",
     install_requires=REQUIRED_PACKAGES,
     dependency_links=DEPENDENCY_LINKS,
