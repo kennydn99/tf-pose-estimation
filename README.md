@@ -1,5 +1,5 @@
 # Important Note
-This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is restrict to tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't sort out. Public package is release at https://pypi.org/project/tf-pose/
+This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is to restrict tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't sorted out. Public package is release at https://pypi.org/project/tf-pose/
 
 # tf-pose-estimation
 
