@@ -1,3 +1,6 @@
+# Important Note
+This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is restrict to tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't sort out. Public package is release at https://pypi.org/project/tf-pose/
+
 # tf-pose-estimation
 
 'Openpose', human pose estimation algorithm, have been implemented using Tensorflow. It also provides several variants that have some changes to the network structure for **real-time processing on the CPU or low-power embedded devices.**
