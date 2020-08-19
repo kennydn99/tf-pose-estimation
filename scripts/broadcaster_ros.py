@@ -41,7 +41,7 @@ def callback_image(data):
     try:
         cv_image = cv_bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError as e:
-        rospy.logerr('[tf-pose-estimation] Converting Image Error. ' + str(e))
+        rospy.logerr("[tf-pose-estimation] Converting Image Error. " + str(e))
         return
 
     acquired = tf_lock.acquire(False)
@@ -49,7 +49,9 @@ def callback_image(data):
         return
 
     try:
-        humans = pose_estimator.inference(cv_image, resize_to_default=True, upsample_size=resize_out_ratio)
+        humans = pose_estimator.inference(
+            cv_image, resize_to_default=True, upsample_size=resize_out_ratio
+        )
     finally:
         tf_lock.release()
 
@@ -61,20 +63,20 @@ def callback_image(data):
     pub_pose.publish(msg)
 
 
-if __name__ == '__main__':
-    rospy.loginfo('initialization+')
-    rospy.init_node('TfPoseEstimatorROS', anonymous=True, log_level=rospy.INFO)
+if __name__ == "__main__":
+    rospy.loginfo("initialization+")
+    rospy.init_node("TfPoseEstimatorROS", anonymous=True, log_level=rospy.INFO)
 
     # parameters
-    image_topic = rospy.get_param('~camera', '')
-    model = rospy.get_param('~model', 'cmu')
+    image_topic = rospy.get_param("~camera", "")
+    model = rospy.get_param("~model", "cmu")
 
-    resolution = rospy.get_param('~resolution', '432x368')
-    resize_out_ratio = float(rospy.get_param('~resize_out_ratio', '4.0'))
+    resolution = rospy.get_param("~resolution", "432x368")
+    resize_out_ratio = float(rospy.get_param("~resize_out_ratio", "4.0"))
     tf_lock = Lock()
 
     if not image_topic:
-        rospy.logerr('Parameter \'camera\' is not provided.')
+        rospy.logerr("Parameter 'camera' is not provided.")
         sys.exit(-1)
 
     try:
@@ -82,17 +84,19 @@ if __name__ == '__main__':
         graph_path = get_graph_path(model)
 
         rospack = rospkg.RosPack()
-        graph_path = os.path.join(rospack.get_path('tfpose_ros'), graph_path)
+        graph_path = os.path.join(rospack.get_path("tfpose_ros"), graph_path)
     except Exception as e:
-        rospy.logerr('invalid model: %s, e=%s' % (model, e))
+        rospy.logerr("invalid model: %s, e=%s" % (model, e))
         sys.exit(-1)
 
     pose_estimator = TfPoseEstimator(graph_path, target_size=(w, h))
     cv_bridge = CvBridge()
 
-    rospy.Subscriber(image_topic, Image, callback_image, queue_size=1, buff_size=2**24)
-    pub_pose = rospy.Publisher('~pose', Persons, queue_size=1)
+    rospy.Subscriber(
+        image_topic, Image, callback_image, queue_size=1, buff_size=2 ** 24
+    )
+    pub_pose = rospy.Publisher("~pose", Persons, queue_size=1)
 
-    rospy.loginfo('start+')
+    rospy.loginfo("start+")
     rospy.spin()
-    rospy.loginfo('finished')
+    rospy.loginfo("finished")

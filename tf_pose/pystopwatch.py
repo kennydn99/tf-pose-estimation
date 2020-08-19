@@ -22,7 +22,9 @@ class StopWatchManager:
         return self.get(name).get_elapsed()
 
     def __repr__(self):
-        return '\n'.join(['%s: %.8f' % (k, v.elapsed_accumulated) for k, v in self.watches.items()])
+        return "\n".join(
+            ["%s: %.8f" % (k, v.elapsed_accumulated) for k, v in self.watches.items()]
+        )
 
 
 class StopWatch:
