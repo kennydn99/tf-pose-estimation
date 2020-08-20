@@ -2,8 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
-import subprocess
+# import os
+# import subprocess
 import setuptools
 from setuptools import dist
 from distutils.core import setup, Extension
@@ -11,9 +11,9 @@ from distutils.core import setup, Extension
 dist.Distribution().fetch_build_eggs(["Cython", "numpy"])
 import numpy as np
 
-cwd = os.path.dirname(os.path.abspath(__file__))
-subprocess.check_output(["bash", "models/graph/cmu/download.sh"], cwd=cwd)
-POSE_DIR = os.path.realpath(os.path.dirname(__file__))
+# cwd = os.path.dirname(os.path.abspath(__file__))
+# subprocess.check_output(["bash", "models/graph/cmu/download.sh"], cwd=cwd)
+# POSE_DIR = os.path.realpath(os.path.dirname(__file__))
 
 REQUIRED_PACKAGES = [
     "argparse>=1.1",
@@ -51,8 +51,8 @@ setuptools.setup(
     version="0.10.0",
     description="Deep Pose Estimation implemented using Tensorflow with Custom Architectures for fast inference.",
     long_description="This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is "
-                     "to restrict tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
-                     "sorted out. Our fork repository is https://github.com/tryagainconcepts/tf-pose-estimation",
+    "to restrict tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
+    "sorted out. Our fork repository is https://github.com/tryagainconcepts/tf-pose-estimation",
     long_description_content_type="text/markdown",
     install_requires=REQUIRED_PACKAGES,
     dependency_links=DEPENDENCY_LINKS,
@@ -62,14 +62,14 @@ setuptools.setup(
     license="Apache License 2.0",
     package_dir={"tf_pose_data": "models"},
     packages=["tf_pose_data"]
-             + [
-                 pkg_name
-                 for pkg_name in setuptools.find_packages()  # main package
-                 if "tf_pose" in pkg_name
-             ],
+    + [
+        pkg_name
+        for pkg_name in setuptools.find_packages()  # main package
+        if "tf_pose" in pkg_name
+    ],
     ext_modules=[EXT],
     package_data={
-        "tf_pose_data": ["graph/cmu/graph_opt.pb", "graph/mobilenet_thin/graph_opt.pb", "graph/cmu/download.sh"],
+        "tf_pose_data": ["graph/mobilenet_thin/graph_opt.pb"],
         "": ["*.h", "*.i"],
     },
     py_modules=["pafprocess"],
