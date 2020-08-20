@@ -45,9 +45,10 @@ EXT = Extension(
     swig_opts=["-c++"],
     include_dirs=[np.get_include()],
 )
+print(EXT)
 setuptools.setup(
     name="tf_pose",
-    version="0.9.0",
+    version="0.10.0",
     description="Deep Pose Estimation implemented using Tensorflow with Custom Architectures for fast inference.",
     long_description="This is a fork of the origninal https://github.com/ildoonet/tf-pose-estimation. Main change is "
                      "to restrict tensorflow 1.X. There are some incompatibility issue with tensorflow 2+ we haven't "
@@ -61,14 +62,15 @@ setuptools.setup(
     license="Apache License 2.0",
     package_dir={"tf_pose_data": "models"},
     packages=["tf_pose_data"]
-    + [
-        pkg_name
-        for pkg_name in setuptools.find_packages()  # main package
-        if "tf_pose" in pkg_name
-    ],
+             + [
+                 pkg_name
+                 for pkg_name in setuptools.find_packages()  # main package
+                 if "tf_pose" in pkg_name
+             ],
     ext_modules=[EXT],
     package_data={
-        "tf_pose_data": ["graph/cmu/graph_opt.pb", "graph/mobilenet_thin/graph_opt.pb", "graph/cmu/download.sh"]
+        "tf_pose_data": ["graph/cmu/graph_opt.pb", "graph/mobilenet_thin/graph_opt.pb", "graph/cmu/download.sh"],
+        "": ["*.h", "*.i"],
     },
     py_modules=["pafprocess"],
     zip_safe=False,
