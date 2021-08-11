@@ -40,7 +40,7 @@ def draw_limbs(image, pose_2d, visible):
             cv2.circle(image, (x0, y0), JOINT_DRAW_SIZE *_NORMALISATION_FACTOR , _COLORS[lid], -1)
             cv2.circle(image, (x1, y1), JOINT_DRAW_SIZE*_NORMALISATION_FACTOR , _COLORS[lid], -1)
             cv2.line(image, (x0, y0), (x1, y1),
-                     _COLORS[lid], LIMB_DRAW_SIZE*_NORMALISATION_FACTOR , 16)
+                     _COLORS[lid], 5 , 16)
 
 
 def plot_pose(pose):

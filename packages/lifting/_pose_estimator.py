@@ -143,6 +143,11 @@ class PoseEstimator(PoseEstimatorInterface):
             estimated_2d_pose.copy(), visibility)
         pose_3d = self.poseLifting.compute_3d(transformed_pose2d, weights)
         pose_2d = np.round(estimated_2d_pose / self.scale).astype(np.int32)
+        
+        print(pose_3d)
+        pose_3dqt = np.array(pose_3d[0]).transpose()
+        for keypoint in pose_3dqt:
+            print(keypoint)
 
         return pose_2d, visibility, pose_3d
 
