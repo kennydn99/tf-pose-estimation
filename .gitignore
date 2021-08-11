@@ -9,3 +9,5 @@ __pycache__/
 
 # folders
 saved_sessions/
+
+*.pb
