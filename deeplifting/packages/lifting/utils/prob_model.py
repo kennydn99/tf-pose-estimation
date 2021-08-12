@@ -7,8 +7,8 @@ Created on Apr 21 13:53 2017
 import os
 import scipy.io as sio
 import numpy as np
-from lifting.utils.upright_fast import pick_e
-from lifting.utils import config
+from .upright_fast import pick_e
+from . import config
 
 __all__ = ['Prob3dPose']
 

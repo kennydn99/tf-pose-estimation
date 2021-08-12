@@ -11,6 +11,8 @@ import numpy as np
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
+from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
+
 logger = logging.getLogger("TfPoseEstimatorRun")
 logger.handlers.clear()
 logger.setLevel(logging.DEBUG)
@@ -183,3 +185,8 @@ if __name__ == "__main__":
     
     cv2.imshow('tf-pose-estimation result', image)
     cv2.waitKey()
+
+    logger.info('3d test')
+    poseLifting = Prob3dPose('./deep-lifting/data/saved_sessions/prob_model/prob_model_params.mat')
+
+    

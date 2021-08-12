@@ -9,7 +9,7 @@ from __future__ import division
 import os
 import json
 import numpy as np
-from lifting.utils import config
+from . import config
 import cv2
 import skimage.io
 import skimage.transform
