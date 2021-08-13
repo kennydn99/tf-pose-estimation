@@ -11,7 +11,7 @@ import __init__
 from lifting import PoseEstimator
 from lifting.utils import draw_limbs
 from lifting.utils import plot_pose
-
+import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from os.path import dirname, realpath
@@ -39,6 +39,10 @@ def main():
     try:
         # estimation
         pose_2d, visibility, pose_3d = pose_estimator.estimate(image)
+        print(pose_3d)
+        pose_3dqt = np.array(pose_3d[0].transpose())
+        for p in pose_3dqt:
+            print(p)
 
         # Show 2D and 3D poses
         display_results(image, pose_2d, visibility, pose_3d)

@@ -12,6 +12,7 @@ from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
 from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
+from deeplifting.packages.lifting.utils.draw import plot_pose
 
 logger = logging.getLogger("TfPoseEstimatorRun")
 logger.handlers.clear()
@@ -186,7 +187,33 @@ if __name__ == "__main__":
     cv2.imshow('tf-pose-estimation result', image)
     cv2.waitKey()
 
-    logger.info('3d test')
-    poseLifting = Prob3dPose('./deep-lifting/data/saved_sessions/prob_model/prob_model_params.mat')
+    logger.info('3d testing')
+    poseLifting = Prob3dPose('./deeplifting/data/saved_sessions/prob_model/prob_model_params.mat')
 
+    image_h, image_w = image.shape[:2]
+    default_w = 640
+    default_h = 480
+
+    pose_2d_mpiis = []
+    visibilities = []
+    for human in humans:
+        pose_2d_mpii, visibility = common.MPIIPart.from_coco(human)
+        pose_2d_mpiis.append([(int(x * default_w + 0.5), int(y * default_h + 0.5)) for x,y in pose_2d_mpii])
+        visibilities.append(visibility)
+
+    pose_2d_mpiis = np.array(pose_2d_mpiis)
+    visibilities = np.array(visibilities)
+    transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
+    pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
+    #print 3d keypoints
+    pose_3dqt = np.array(pose_3d[0].transpose())
+    for p in pose_3dqt:
+        print(p)
+
+    #try to print 3d plot
+    #import matplotlib.pyplot as plt
+    #figure = plt.figure()
+    #a = figure.add_subplot(2, 2, 1)
+    #a.set_title('3D result')
+    #plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     
