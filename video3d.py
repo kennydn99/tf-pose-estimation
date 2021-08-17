@@ -33,8 +33,18 @@ class Grid(object):
         self.window.addItem(x)
         self.window.addItem(y)
         self.window.addItem(z)
-         #create model
+        
+        #create model
         model = 'cmu'
+
+        #dictionary to hold all line segments
+        self.lines = {}
+        self.connection = [
+            [0, 1], [1, 2], [2, 3], [0, 4], [4, 5], [5, 6], [0, 7], [7, 8],
+            [8, 9], [9, 10], [8, 11], [11, 12], [12, 13], [8, 14], [14, 15],
+            [15, 16]
+        ]
+
         self.w, self.h = model_wh(args.resize)
         #432x368 default target size
         self.e = TfPoseEstimator(get_graph_path(model), target_size=(self.w, self.h))
@@ -46,8 +56,21 @@ class Grid(object):
         keypoints = self.mesh(image)
 
         #create scatterplot object
-        self.points = gl.GLScatterPlotItem(pos=keypoints, color=pg.glColor((0,255,0)), size=15)
+        self.points = gl.GLScatterPlotItem(
+            pos=keypoints, 
+            color=pg.glColor((0,255,0)), 
+            size=15
+        )
         self.window.addItem(self.points)
+        #create connecting lines and plot
+        for idx, pts in enumerate(self.connection):
+            self.lines[idx] = gl.GLLinePlotItem(
+                pos = np.array([keypoints[p] for p in pts]),
+                color = pg.glColor((0,0,255)),
+                width=3,
+                antialias = True
+            )
+            self.window.addItem(self.lines[idx])
 
     def mesh(self, image):
         #return 3d keypoints, do inference based on image
@@ -93,6 +116,11 @@ class Grid(object):
         else:
             #update scatterplot
             self.points.setData(pos=keypoints)
+            #update lines
+            for idx, pts in enumerate(self.connection):
+                self.lines[idx].setData(
+                    pos = np.array([keypoints[p] for p in pts])
+                )
 
     def start(self):
         #open grid window and setup
