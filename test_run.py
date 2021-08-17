@@ -206,14 +206,17 @@ if __name__ == "__main__":
     transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
     pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
     #print 3d keypoints
+    print(pose_3d)
     pose_3dqt = np.array(pose_3d[0].transpose())
     for p in pose_3dqt:
         print(p)
 
-    #try to print 3d plot
-    #import matplotlib.pyplot as plt
-    #figure = plt.figure()
-    #a = figure.add_subplot(2, 2, 1)
-    #a.set_title('3D result')
-    #plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    try:
+        import matplotlib.pyplot as plt
+
+        for single_3d in pose_3d:
+            plot_pose(single_3d)
+        plt.show()
+    except Exception as e:
+        logger.warning("matplotlib error, %s" % e)
     

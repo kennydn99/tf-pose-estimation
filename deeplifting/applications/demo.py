@@ -39,7 +39,7 @@ def main():
     try:
         # estimation
         pose_2d, visibility, pose_3d = pose_estimator.estimate(image)
-        print(pose_3d)
+        
         pose_3dqt = np.array(pose_3d[0].transpose())
         for p in pose_3dqt:
             print(p)
