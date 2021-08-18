@@ -93,29 +93,6 @@ if __name__ == "__main__":
 
     #find perpendicular coordinates function - pass in two joint coordinates 
     def perpCoord(a,b):
-        a = np.array(a)
-        b = np.array(b)
-        # find length between a and b
-        length = np.linalg.norm(a-b)
-        #get direction vector = [delta x, delta y]
-        dv = [b[0] - a[0], b[1] - a[1]]
-        if dv[0] == 0 or dv[1] == 0:
-            c = [b[0], b[1] + length]
-            return c, dv
-        #get magnitude
-        var = math.sqrt(dv[0]*dv[0] + dv[1]*dv[1])
-        dv[0] = dv[0]/var
-        dv[1] = dv[1]/var
-        #invert direction vector coordinate and swap
-        dv[0], dv[1] = -dv[1], dv[0]
-        # new line starting at b pointing in direction of dv
-        if b[0] < a[0]:
-            c = [b[0] - dv[0] * length, b[1] - dv[1] * length]
-        else:
-            c = [b[0] + dv[0] * length, b[1] + dv[1] * length]
-        return c
-
-    def test_new_perpCoord(a,b):
         a = np.array(a) #elbow
         b = np.array(b) #shoulder
         # find length between a and b
@@ -156,8 +133,8 @@ if __name__ == "__main__":
             
             img_h, img_w = image.shape[:2]
             #Calculate & visualize the angle for right and left shoulder
-            right_pc = test_new_perpCoord(RE, RS)
-            left_pc = test_new_perpCoord(LE, LS)
+            right_pc = perpCoord(RE, RS)
+            left_pc = perpCoord(LE, LS)
             right_angle = math.ceil(calculate_angle(right_pc, RS, RE))
             left_angle = math.ceil(calculate_angle(left_pc, LS, LE))
             cv2.putText(
@@ -174,7 +151,6 @@ if __name__ == "__main__":
                         0.5, (255,255,255), 1,
                         cv2.LINE_AA
                     )
-            
         except:
             pass
         
@@ -186,14 +162,14 @@ if __name__ == "__main__":
                     image,
                     tuple(np.multiply(neck, [img_w, img_h]).astype(int)),
                     tuple(np.multiply(mid, [img_w, img_h]).astype(int)),
-                    (0,255,255),
+                    (255,0,0),
                     3
                 )
             cv2.circle(
                     image,
                     tuple(np.multiply(cg, [img_w, img_h]).astype(int)),
                     3,
-                    (255,0,255),
+                    (0,255,0),
                     thickness=3,
                     lineType=8,
                     shift=0,
