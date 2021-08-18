@@ -1,18 +1,18 @@
 Bodypart,X,Y,Z
-Bottom torso,-33.95,31.61,-155.13
-HipRight,-160.06,-38.29,-158.76
-KneeRight,-141.39,-138.08,-576.20
-FootRight,-154.44,-11.04,-944.81
-HipLeft,53.70,101.50,-158.60
-KneeLeft,54.11,28.43,-576.76
-FootLeft,15.54,143.58,-943.62
-SpineMid,-40.47,59.26,144.16
-SpineShoulder,-56.11,39.10,487.70
-NeckBase,15.25,-40.30,555.84
-CenterHead,-46.83,6.02,723.12
-ShoulderLeft,154.38,130.54,418.86
-ElbowLeft,420.02,154.11,382.44
-WristLeft,637.19,13.10,402.38
-ShoulderRight,-217.15,-28.24,411.00
-ElbowRight,-321.51,-167.73,230.05
-WristRight,-237.45,-296.12,89.52
+Bottom torso,-4.01,-35.09,-132.34
+HipRight,-121.31,-36.67,-106.47
+KneeRight,-110.93,-85.65,-539.75
+FootRight,-105.94,-1.82,-980.09
+HipLeft,94.34,-33.50,-106.89
+KneeLeft,121.53,-88.69,-539.81
+FootLeft,117.54,-5.74,-979.56
+SpineMid,-2.64,30.44,125.05
+SpineShoulder,3.62,65.10,401.57
+NeckBase,-0.21,-13.36,484.22
+CenterHead,4.26,35.74,606.47
+ShoulderLeft,164.90,85.25,351.19
+ElbowLeft,440.95,64.79,326.65
+WristLeft,628.94,-69.27,378.01
+ShoulderRight,-190.88,81.97,350.80
+ElbowRight,-430.91,68.33,322.22
+WristRight,-616.12,-61.84,328.62
