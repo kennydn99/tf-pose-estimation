@@ -106,6 +106,14 @@ if __name__ == "__main__":
             c = [b[0] + dv[0] * length, b[1] + dv[1] * length]
         return c
 
+    def test_new_perpCoord(a,b):
+        a = np.array(a) #elbow
+        b = np.array(b) #shoulder
+        # find length between a and b
+        length = np.linalg.norm(a-b)
+        #delta x and delta y
+        dv = [b[0] - a[0], b[1] - a[1]]
+        return [b[0], b[1] + length]
     
     #funtion to find midpoint coordinates between two points
     def midpoint(first, last):
@@ -127,6 +135,11 @@ if __name__ == "__main__":
             left_hip = [human.body_parts[11].x, human.body_parts[11].y]
     
         #find perpendicular coordinates and calculate the angle
+        test_pc = test_new_perpCoord(right_elbow, right_shoulder)
+        test_leftpc = test_new_perpCoord(left_elbow, left_shoulder)
+        new_angle = math.ceil(calculate_angle(test_pc, right_shoulder, right_elbow))
+        new_leftangle = math.ceil(calculate_angle(test_leftpc, left_shoulder, left_elbow))
+
         pc = perpCoord(neck_coord, right_shoulder)
         left_pc = perpCoord(neck_coord, left_shoulder)
         jointAngle = calculate_angle(pc, right_shoulder, right_elbow)
@@ -136,21 +149,21 @@ if __name__ == "__main__":
 
         #test visualizing angle on image
         img_h, img_w = image.shape[:2]
-        cv2.putText(image, formatted_angle,
+        cv2.putText(image, str(new_angle),
                 tuple(np.multiply(right_shoulder, [img_w, img_h]).astype(int)),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (255,255,255), 1,
                 cv2.LINE_AA
             )
-        cv2.putText(image, left_formatted_angle,
+        cv2.putText(image, str(new_leftangle),
                 tuple(np.multiply(left_shoulder, [img_w, img_h]).astype(int)),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (255,255,255), 1,
                 cv2.LINE_AA
             )
         #visualize perpendicular coordinate
-        #cv2.circle(image,tuple(np.multiply(pc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
-        #cv2.circle(image,tuple(np.multiply(left_pc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
+        cv2.circle(image,tuple(np.multiply(test_pc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
+        cv2.circle(image,tuple(np.multiply(test_leftpc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
         #test midpoint
         mid = midpoint(right_hip, left_hip)
         cv2.circle(

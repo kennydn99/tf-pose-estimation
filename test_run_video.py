@@ -115,6 +115,15 @@ if __name__ == "__main__":
             c = [b[0] + dv[0] * length, b[1] + dv[1] * length]
         return c
 
+    def test_new_perpCoord(a,b):
+        a = np.array(a) #elbow
+        b = np.array(b) #shoulder
+        # find length between a and b
+        length = np.linalg.norm(a-b)
+        #delta x and delta y
+        dv = [b[0] - a[0], b[1] - a[1]]
+        return [b[0], b[1] + length]
+
     #funtion to find midpoint coordinates between two points
     def midpoint(first, last):
         first = np.array(first)
@@ -147,19 +156,19 @@ if __name__ == "__main__":
             
             img_h, img_w = image.shape[:2]
             #Calculate & visualize the angle for right and left shoulder
-            right_pc = perpCoord(neck, RS)
-            left_pc = perpCoord(neck, LS)
-            right_angle = "{:.2f}".format(calculate_angle(right_pc, RS, RE))
-            left_angle = "{:.2f}".format(calculate_angle(left_pc, LS, LE))
+            right_pc = test_new_perpCoord(RE, RS)
+            left_pc = test_new_perpCoord(LE, LS)
+            right_angle = math.ceil(calculate_angle(right_pc, RS, RE))
+            left_angle = math.ceil(calculate_angle(left_pc, LS, LE))
             cv2.putText(
-                        image, right_angle,
+                        image, str(right_angle),
                         tuple(np.multiply(RS, [img_w, img_h]).astype(int)),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, (255,255,255), 1,
                         cv2.LINE_AA
                     )
             cv2.putText(
-                        image, left_angle,
+                        image, str(left_angle),
                         tuple(np.multiply(LS, [img_w, img_h]).astype(int)),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, (255,255,255), 1,
