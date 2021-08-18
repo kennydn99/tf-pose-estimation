@@ -13,6 +13,7 @@ from tf_pose.networks import get_graph_path, model_wh
 
 from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
 from deeplifting.packages.lifting.utils.draw import plot_pose
+#from deeplifting.applications.demo import display_results
 
 logger = logging.getLogger("TfPoseEstimatorRun")
 logger.handlers.clear()
@@ -84,29 +85,6 @@ if __name__ == "__main__":
 
     #find perpendicular coordinates function - pass in two joint coordinates 
     def perpCoord(a,b):
-        a = np.array(a)
-        b = np.array(b)
-        # find length between a and b
-        length = np.linalg.norm(a-b)
-        #get direction vector = [delta x, delta y]
-        dv = [b[0] - a[0], b[1] - a[1]]
-        if dv[0] == 0 or dv[1] == 0:
-            c = [b[0], b[1] + length]
-            return c, dv
-        #get magnitude
-        var = math.sqrt(dv[0]*dv[0] + dv[1]*dv[1])
-        dv[0] = dv[0]/var
-        dv[1] = dv[1]/var
-        #invert direction vector coordinate and swap
-        dv[0], dv[1] = -dv[1], dv[0]
-        # new line starting at b pointing in direction of dv
-        if b[0] < a[0]:
-            c = [b[0] - dv[0] * length, b[1] - dv[1] * length]
-        else:
-            c = [b[0] + dv[0] * length, b[1] + dv[1] * length]
-        return c
-
-    def test_new_perpCoord(a,b):
         a = np.array(a) #elbow
         b = np.array(b) #shoulder
         # find length between a and b
@@ -124,76 +102,59 @@ if __name__ == "__main__":
     image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
     
     try:
-        for human in humans: 
-            # save coordinates of shoulder, hip, and elbow & neck
-            neck_coord = [human.body_parts[1].x, human.body_parts[1].y]
-            right_shoulder = [human.body_parts[2].x, human.body_parts[2].y]
-            right_elbow = [human.body_parts[3].x, human.body_parts[3].y]
-            right_hip = [human.body_parts[8].x, human.body_parts[8].y]
-            left_shoulder = [human.body_parts[5].x, human.body_parts[5].y]
-            left_elbow = [human.body_parts[6].x, human.body_parts[6].y]
-            left_hip = [human.body_parts[11].x, human.body_parts[11].y]
-    
-        #find perpendicular coordinates and calculate the angle
-        test_pc = test_new_perpCoord(right_elbow, right_shoulder)
-        test_leftpc = test_new_perpCoord(left_elbow, left_shoulder)
-        new_angle = math.ceil(calculate_angle(test_pc, right_shoulder, right_elbow))
-        new_leftangle = math.ceil(calculate_angle(test_leftpc, left_shoulder, left_elbow))
-
-        pc = perpCoord(neck_coord, right_shoulder)
-        left_pc = perpCoord(neck_coord, left_shoulder)
-        jointAngle = calculate_angle(pc, right_shoulder, right_elbow)
-        formatted_angle = "{:.2f}".format(jointAngle)
-        left_jointAngle = calculate_angle(left_pc, left_shoulder, left_elbow)
-        left_formatted_angle = "{:.2f}".format(left_jointAngle)
-
-        #test visualizing angle on image
+        for human in humans:
+            #save coordinates of shoulder, hip, and elbow & neck
+            neck = [human.body_parts[1].x, human.body_parts[1].y]
+            RS = [human.body_parts[2].x, human.body_parts[2].y]
+            RE = [human.body_parts[3].x, human.body_parts[3].y]
+            RH = [human.body_parts[8].x, human.body_parts[8].y]
+            LS = [human.body_parts[5].x, human.body_parts[5].y]
+            LE = [human.body_parts[6].x, human.body_parts[6].y]
+            LH = [human.body_parts[11].x, human.body_parts[11].y]
+            
         img_h, img_w = image.shape[:2]
-        cv2.putText(image, str(new_angle),
-                tuple(np.multiply(right_shoulder, [img_w, img_h]).astype(int)),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (255,255,255), 1,
-                cv2.LINE_AA
-            )
-        cv2.putText(image, str(new_leftangle),
-                tuple(np.multiply(left_shoulder, [img_w, img_h]).astype(int)),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (255,255,255), 1,
-                cv2.LINE_AA
-            )
-        #visualize perpendicular coordinate
-        cv2.circle(image,tuple(np.multiply(test_pc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
-        cv2.circle(image,tuple(np.multiply(test_leftpc, [img_w, img_h]).astype(int)),3,(0,0,255),thickness=3,lineType=8,shift=0)
-        #test midpoint
-        mid = midpoint(right_hip, left_hip)
-        cv2.circle(
-                    image,
-                    tuple(np.multiply(mid, [img_w, img_h]).astype(int)),
-                    3,
-                    (0,255,255),
-                    thickness=3,
-                    lineType=8,
-                    shift=0,
+        #Calculate & visualize the angle for right and left shoulder
+        right_pc = perpCoord(RE, RS)
+        left_pc = perpCoord(LE, LS)
+        right_angle = math.ceil(calculate_angle(right_pc, RS, RE))
+        left_angle = math.ceil(calculate_angle(left_pc, LS, LE))
+        cv2.putText(
+                    image, str(right_angle),
+                    tuple(np.multiply(RS, [img_w, img_h]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (255,255,255), 1,
+                    cv2.LINE_AA
                 )
-        #Draw spine
+        cv2.putText(
+                    image, str(left_angle),
+                    tuple(np.multiply(LS, [img_w, img_h]).astype(int)),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (255,255,255), 1,
+                    cv2.LINE_AA
+                )
+    except:
+        pass
+        
+    try:
+        #draw spine and visualize center of gravity
+        mid = midpoint(RH, LH)
+        cg = midpoint(neck, mid)
         cv2.line(
-                    image,
-                    tuple(np.multiply(neck_coord, [img_w, img_h]).astype(int)),
-                    tuple(np.multiply(mid, [img_w, img_h]).astype(int)),
-                    (0,255,255),
-                    3
-                )
-        #find center of gravity
-        cg = midpoint(neck_coord, mid)
+                image,
+                tuple(np.multiply(neck, [img_w, img_h]).astype(int)),
+                tuple(np.multiply(mid, [img_w, img_h]).astype(int)),
+                (255,0,0),
+                3
+            )
         cv2.circle(
-                    image,
-                    tuple(np.multiply(cg, [img_w, img_h]).astype(int)),
-                    3,
-                    (255,0,255),
-                    thickness=3,
-                    lineType=8,
-                    shift=0,
-                )
+                image,
+                tuple(np.multiply(cg, [img_w, img_h]).astype(int)),
+                3,
+                (0,255,0),
+                thickness=3,
+                lineType=8,
+                shift=0,
+            )
     except:
         pass
     
@@ -218,11 +179,13 @@ if __name__ == "__main__":
     visibilities = np.array(visibilities)
     transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
     pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
+    
     #print 3d keypoints
-    print(pose_3d)
     pose_3dqt = np.array(pose_3d[0].transpose())
     for p in pose_3dqt:
         print(p)
+
+    #display_results(image, pose_2d_mpiis, visibilities, pose_3d)
 
     try:
         import matplotlib.pyplot as plt
@@ -232,16 +195,16 @@ if __name__ == "__main__":
         a.set_title("Result")
         plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-        bgimg = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
+        '''bgimg = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
         bgimg = cv2.resize(
             bgimg,
             (e.heatMat.shape[1], e.heatMat.shape[0]),
             interpolation=cv2.INTER_AREA,
-        )
+        )'''
 
         # show network output
         a = fig.add_subplot(2, 2, 2)
-        plt.imshow(bgimg, alpha=0.5)
+        #plt.imshow(bgimg, alpha=0.5)
         tmp = np.amax(e.heatMat[:, :, :-1], axis=2)
         plt.imshow(tmp, cmap=plt.cm.gray, alpha=0.5)
         plt.colorbar()
@@ -261,7 +224,7 @@ if __name__ == "__main__":
         # plt.imshow(CocoPose.get_bgimg(inp, target_size=(vectmap.shape[1], vectmap.shape[0])), alpha=0.5)
         plt.imshow(tmp2_even, cmap=plt.cm.gray, alpha=0.5)
         plt.colorbar()
-        plt.show()
+        #plt.show()
 
         #plot 3d points and show
         for i, single_3d in enumerate(pose_3d):
