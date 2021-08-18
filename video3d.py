@@ -40,9 +40,16 @@ class Grid(object):
         #dictionary to hold all line segments
         self.lines = {}
         self.connection = [
-            [0, 1], [1, 2], [2, 3], [0, 4], [4, 5], [5, 6], [0, 7], [7, 8],
-            [8, 9], [9, 10], [8, 11], [11, 12], [12, 13], [8, 14], [14, 15],
-            [15, 16]
+            [0, 1], [1, 2], [2, 3], [0, 4],
+            [4, 5], [5, 6], [0, 7], [7, 8],
+            [8, 9], [9, 10], [8, 11], [11, 12],
+            [12, 13], [8, 14], [14, 15], [15, 16]
+        ]
+        self.colors = [
+            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
+            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
+            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
+            (0,0,255), (0,0,255), (0,0,255), (0,0,255)
         ]
 
         self.w, self.h = model_wh(args.resize)
@@ -57,7 +64,7 @@ class Grid(object):
 
         #create scatterplot object
         self.points = gl.GLScatterPlotItem(
-            pos=keypoints, 
+            pos=keypoints,
             color=pg.glColor((0,255,0)), 
             size=15
         )
@@ -66,7 +73,7 @@ class Grid(object):
         for idx, pts in enumerate(self.connection):
             self.lines[idx] = gl.GLLinePlotItem(
                 pos = np.array([keypoints[p] for p in pts]),
-                color = pg.glColor((0,0,255)),
+                color = pg.glColor(self.colors[idx]),
                 width=3,
                 antialias = True
             )

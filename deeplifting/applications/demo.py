@@ -7,7 +7,7 @@ Created on Dec 20 17:39 2016
 """
 
 import __init__
-
+import csv
 from lifting import PoseEstimator
 from lifting.utils import draw_limbs
 from lifting.utils import plot_pose
@@ -40,9 +40,13 @@ def main():
         # estimation
         pose_2d, visibility, pose_3d = pose_estimator.estimate(image)
         
+        # print out transposed 3d keypoints
         pose_3dqt = np.array(pose_3d[0].transpose())
         for p in pose_3dqt:
             print(p)
+        
+        # Try to put 3d keypoints in csv file
+        writeToCSV('3dkeypoints.csv', pose_3dqt)
 
         # Show 2D and 3D poses
         display_results(image, pose_2d, visibility, pose_3d)
@@ -51,6 +55,25 @@ def main():
 
     # close model
     pose_estimator.close()
+
+def writeToCSV(filename, pose_data3d):
+    """write 3d keypoints data to a csv file"""
+    header = ['Bodypart', 'X', 'Y', 'Z']
+    bodypart_name = [
+        "Bottom torso", "HipRight", "KneeRight", "FootRight",
+        "HipLeft", "KneeLeft", "FootLeft", "SpineMid",
+        "SpineShoulder", "NeckBase", "CenterHead", "ShoulderLeft",
+        "ElbowLeft", "WristLeft", "ShoulderRight", "ElbowRight", "WristRight"
+    ]
+    idx = 0
+    rows = []
+    with open(filename, 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(header)
+        for data in pose_data3d:
+            rows.append([bodypart_name[idx], "{:.2f}".format(data[0]), "{:.2f}".format(data[1]), "{:.2f}".format(data[2])])
+            idx += 1
+        writer.writerows(rows)
 
 
 def display_results(in_image, data_2d, joint_visibility, data_3d):
