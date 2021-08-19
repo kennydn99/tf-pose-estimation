@@ -36,17 +36,31 @@ def main():
     # load model
     pose_estimator.initialise()
 
+    # variables for csv files
+    bodypart_dict = {
+        0:"Bottom torso", 1:"HipRight", 2:"KneeRight", 3:"FootRight",
+        4:"HipLeft", 5:"KneeLeft", 6:"FootLeft", 7:"SpineMid",
+        8:"SpineShoulder", 9:"NeckBase", 10:"CenterHead", 11:"ShoulderLeft",
+        12:"ElbowLeft", 13:"WristLeft", 14:"ShoulderRight", 15:"ElbowRight", 16:"WristRight"
+    }
+    data3dpoints = []
+    frameNum = 1
     try:
         # estimation
         pose_2d, visibility, pose_3d = pose_estimator.estimate(image)
-        
+
         # print out transposed 3d keypoints
         pose_3dqt = np.array(pose_3d[0].transpose())
         for p in pose_3dqt:
+            data3dpoints.append([frameNum, "{:.2f}".format(p[0]), "{:.2f}".format(p[1]), "{:.2f}".format(p[2])])
             print(p)
         
         # Try to put 3d keypoints in csv file
-        writeToCSV('3dkeypoints.csv', pose_3dqt)
+        #writeToCSV('3dkeypoints.csv', pose_3dqt)
+
+        for x,y in bodypart_dict.items():
+            createCSV(1, y, pose_3dqt)
+            addDataToCSV(y, data3dpoints[x])
 
         # Show 2D and 3D poses
         display_results(image, pose_2d, visibility, pose_3d)
@@ -75,6 +89,16 @@ def writeToCSV(filename, pose_data3d):
             idx += 1
         writer.writerows(rows)
 
+def createCSV(frameNum, filename, data3d):
+    header = ["Frame Number", 'X', 'Y', 'Z']
+    with open(filename + '.csv', 'w') as f:
+        w = csv.writer(f)
+        w.writerow(header)
+
+def addDataToCSV(file, newdata):
+    with open(file + '.csv', 'a') as f:
+        write = csv.writer(f)
+        write.writerow(newdata)
 
 def display_results(in_image, data_2d, joint_visibility, data_3d):
     """Plot 2D and 3D poses for each of the people in the image."""
