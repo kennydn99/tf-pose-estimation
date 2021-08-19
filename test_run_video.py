@@ -5,9 +5,10 @@ import math
 import cv2
 import numpy as np
 
-
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
+
+from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
 
 logger = logging.getLogger("TfPoseEstimator-WebCam")
 logger.setLevel(logging.DEBUG)
@@ -19,10 +20,8 @@ logger.addHandler(ch)
 
 fps_time = 0
 
-
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="tf-pose-estimation realtime webcam")
@@ -190,8 +189,9 @@ if __name__ == "__main__":
 
         cv2.imshow("tf-pose-estimation result", image)
         fps_time = time.time()
+
         if cv2.waitKey(1) == 27:
             break
         logger.debug("finished+")
-
+    cam.release()
     cv2.destroyAllWindows()
