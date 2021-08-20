@@ -133,10 +133,18 @@ if __name__ == "__main__":
     
     #find total num of frames
     totalFrameNum = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
-    sample_rate = totalFrameNum/1
+    sample_rate = totalFrameNum/100
     fno = 0
     success, image = cam.read()
     
+    #create other pose estimator for 3d
+    pose_estimator = PoseEstimator(
+            image.shape,
+            './deeplifting/data/saved_sessions/init_session/init',
+            './deeplifting/data/saved_sessions/prob_model/prob_model_params.mat'
+        )
+    pose_estimator.initialise()
+
     while success:
         if fno % sample_rate == 0:
             ret_val, image = cam.retrieve()
@@ -213,6 +221,10 @@ if __name__ == "__main__":
             #change nparray back to list
             pose_2d_mpiis = pose_2d_mpiis.tolist()
             visibilities = visibilities.tolist()
+            '''
+            for human in humans:
+                pose_2d_mpii, visibility, newpose3d = pose_estimator.estimate(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE))
+            transposed_3dpoints = np.array(newpose3d[0]).transpose()'''
 
             #add transposed 3d data and current frame to 3d data list and update csv file
             for data in transposed_3dpoints:
