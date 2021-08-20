@@ -1,3 +1,4 @@
+'''Calculate ROM for shoulder joint for a video'''
 import argparse
 import logging
 import time
@@ -43,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         type=str,
-        default="mobilenet_thin",
+        default="cmu",
         help="cmu / mobilenet_thin / mobilenet_v2_large / mobilenet_v2_small",
     )
     parser.add_argument(

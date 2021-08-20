@@ -1,3 +1,4 @@
+'''Project 2D and 3D Pose for an image'''
 import argparse
 import logging
 import sys

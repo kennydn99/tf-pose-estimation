@@ -1,3 +1,4 @@
+'''2D to 3D translation given a video'''
 import numpy as np
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg
