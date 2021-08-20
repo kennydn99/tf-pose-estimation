@@ -102,7 +102,8 @@ class Grid(object):
 
         #[x, y, z] format
         keypoints = pose_3d[0].transpose()
-
+        for point in keypoints:
+            print(point)
         return keypoints / 80
 
     def update(self):

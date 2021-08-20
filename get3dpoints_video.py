@@ -1,5 +1,3 @@
-'''Must delete CSV folder to run again'''
-
 import argparse
 import logging
 import time
@@ -15,7 +13,6 @@ from tf_pose.networks import get_graph_path, model_wh
 
 from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
 from deeplifting.applications.demo import createCSV, addDataToCSV
-from deeplifting.packages.lifting._pose_estimator import PoseEstimator
 
 logger = logging.getLogger("TfPoseEstimator-WebCam")
 logger.setLevel(logging.DEBUG)
@@ -83,8 +80,6 @@ if __name__ == "__main__":
         )
     logger.debug("cam read+")
     cam = cv2.VideoCapture(args.video)
-    #ret_val, image = cam.read()
-    #logger.info("cam image=%dx%d" % (image.shape[1], image.shape[0]))
 
     #funtion to find midpoint coordinates between two points
     def midpoint(first, last):
@@ -108,11 +103,7 @@ if __name__ == "__main__":
     #variables for getting 3d data
     poseLifting = Prob3dPose('./deeplifting/data/saved_sessions/prob_model/prob_model_params.mat')
     
-    #image_h, image_w = image.shape[:2]
-    default_w = 640
-    default_h = 480
-    pose_2d_mpiis = []
-    visibilities = []
+    
 
     #variables for writing to csv file
     frameNum = 1
@@ -122,13 +113,15 @@ if __name__ == "__main__":
         8:"SpineShoulder", 9:"NeckBase", 10:"CenterHead", 11:"ShoulderLeft",
         12:"ElbowLeft", 13:"WristLeft", 14:"ShoulderRight", 15:"ElbowRight", 16:"WristRight"
     }
-    data3dpoints = []
+    
     
     #make folder to store all csv files
     try:
+        if os.path.isdir("./CSV"):
+            os.remove("./CSV")
         os.mkdir("./CSV")
-    except OSError as e:
-        print("The directory exists")
+    except:
+        pass
     #first create csv files for all body parts
     for val in bodypart_dict.values():
         createCSV(val)
@@ -138,19 +131,10 @@ if __name__ == "__main__":
     sample_rate = totalFrameNum/1
     fno = 0
     success, image = cam.read()
-    
-    #create other pose estimator for 3d
-    pose_estimator = PoseEstimator(
-            image.shape,
-            './deeplifting/data/saved_sessions/init_session/init',
-            './deeplifting/data/saved_sessions/prob_model/prob_model_params.mat'
-        )
-    pose_estimator.initialise()
 
     while success:
         if fno % sample_rate == 0:
             ret_val, image = cam.retrieve()
-            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
             logger.debug("image process+")
             
             humans = e.inference(
@@ -203,9 +187,15 @@ if __name__ == "__main__":
                 2,
             )
 
-            cv2.imshow("tf-pose-estimation result", image)
+            cv2.imshow("tf-pose-estimation result", cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE))
             fps_time = time.time()
             
+            #image_h, image_w = image.shape[:2]
+            default_w = 640
+            default_h = 480
+            pose_2d_mpiis = []
+            visibilities = []
+            data3dpoints = []
             
             # collect 3d data points
             for human in humans:
@@ -219,25 +209,14 @@ if __name__ == "__main__":
             visibilities = np.array(visibilities)
             transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
             pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
-            transposed_3dpoints = np.array(pose_3d[0]).transpose()
-            #change nparray back to list
-            pose_2d_mpiis = pose_2d_mpiis.tolist()
-            visibilities = visibilities.tolist()
-            '''
-            for human in humans:
-                pose_2d_mpii, visibility, newpose3d = pose_estimator.estimate(cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE))
-            transposed_3dpoints = np.array(newpose3d[0]).transpose()'''
-
+            transposed_3dpoints = pose_3d[0].transpose()
+            
             #add transposed 3d data and current frame to 3d data list and update csv file
             for data in transposed_3dpoints:
                 data3dpoints.append([frameNum, "{:.2f}".format(data[0]), "{:.2f}".format(data[1]), "{:.2f}".format(data[2])])
             for index, bodypart in bodypart_dict.items():
                 addDataToCSV(bodypart, data3dpoints[index])
 
-            #clear lists
-            pose_2d_mpiis.clear()
-            visibilities.clear()
-            data3dpoints.clear()
             frameNum += 1
         #next frame
         success, image = cam.read()
