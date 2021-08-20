@@ -1,3 +1,5 @@
+'''Must delete CSV folder to run again'''
+
 import argparse
 import logging
 import time
@@ -133,7 +135,7 @@ if __name__ == "__main__":
     
     #find total num of frames
     totalFrameNum = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
-    sample_rate = totalFrameNum/100
+    sample_rate = totalFrameNum/1
     fno = 0
     success, image = cam.read()
     

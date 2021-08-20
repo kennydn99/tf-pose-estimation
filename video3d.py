@@ -45,12 +45,6 @@ class Grid(object):
             [8, 9], [9, 10], [8, 11], [11, 12],
             [12, 13], [8, 14], [14, 15], [15, 16]
         ]
-        self.colors = [
-            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
-            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
-            (0,0,255), (0,0,255), (0,0,255), (0,0,255),
-            (0,0,255), (0,0,255), (0,0,255), (0,0,255)
-        ]
 
         self.w, self.h = model_wh(args.resize)
         #432x368 default target size
@@ -65,7 +59,7 @@ class Grid(object):
         #create scatterplot object
         self.points = gl.GLScatterPlotItem(
             pos=keypoints,
-            color=pg.glColor((0,255,0)), 
+            color=pg.glColor((51,255,153)), 
             size=15
         )
         self.window.addItem(self.points)
@@ -73,7 +67,7 @@ class Grid(object):
         for idx, pts in enumerate(self.connection):
             self.lines[idx] = gl.GLLinePlotItem(
                 pos = np.array([keypoints[p] for p in pts]),
-                color = pg.glColor(self.colors[idx]),
+                color = pg.glColor((153,51,255)),
                 width=3,
                 antialias = True
             )
