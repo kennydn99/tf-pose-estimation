@@ -13,7 +13,7 @@ from tf_pose.networks import get_graph_path, model_wh
 
 from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
 from deeplifting.packages.lifting.utils.draw import plot_pose
-#from deeplifting.applications.demo import display_results
+from deeplifting.packages.lifting._pose_estimator import PoseEstimator
 
 logger = logging.getLogger("TfPoseEstimatorRun")
 logger.handlers.clear()
@@ -161,8 +161,54 @@ if __name__ == "__main__":
     cv2.imshow('tf-pose-estimation result', image)
     cv2.waitKey()
 
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure()
+    a = fig.add_subplot(2, 2, 1)
+    a.set_title("Result")
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    bgimg = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
+    bgimg = cv2.resize(
+        bgimg,
+        (e.heatMat.shape[1], e.heatMat.shape[0]),
+        interpolation=cv2.INTER_AREA,
+    )
+
+    # show network output
+    a = fig.add_subplot(2, 2, 2)
+    plt.imshow(bgimg, alpha=0.5)
+    tmp = np.amax(e.heatMat[:, :, :-1], axis=2)
+    plt.imshow(tmp, cmap=plt.cm.gray, alpha=0.5)
+    plt.colorbar()
+
+    tmp2 = e.pafMat.transpose((2, 0, 1))
+    tmp2_odd = np.amax(np.absolute(tmp2[::2, :, :]), axis=0)
+    tmp2_even = np.amax(np.absolute(tmp2[1::2, :, :]), axis=0)
+
+    a = fig.add_subplot(2, 2, 3)
+    a.set_title("Vectormap-x")
+    # plt.imshow(CocoPose.get_bgimg(inp, target_size=(vectmap.shape[1], vectmap.shape[0])), alpha=0.5)
+    plt.imshow(tmp2_odd, cmap=plt.cm.gray, alpha=0.5)
+    plt.colorbar()
+
+    a = fig.add_subplot(2, 2, 4)
+    a.set_title("Vectormap-y")
+    # plt.imshow(CocoPose.get_bgimg(inp, target_size=(vectmap.shape[1], vectmap.shape[0])), alpha=0.5)
+    plt.imshow(tmp2_even, cmap=plt.cm.gray, alpha=0.5)
+    plt.colorbar()
+    plt.show()
+
     logger.info('3d testing')
     poseLifting = Prob3dPose('./deeplifting/data/saved_sessions/prob_model/prob_model_params.mat')
+
+    #test other pose estimator
+    pose_estimator = PoseEstimator(
+            image.shape,
+            './deeplifting/data/saved_sessions/init_session/init',
+            './deeplifting/data/saved_sessions/prob_model/prob_model_params.mat'
+        )
+    pose_estimator.initialise()
 
     image_h, image_w = image.shape[:2]
     default_w = 640
@@ -171,66 +217,24 @@ if __name__ == "__main__":
     pose_2d_mpiis = []
     visibilities = []
     for human in humans:
-        pose_2d_mpii, visibility = common.MPIIPart.from_coco(human)
-        pose_2d_mpiis.append([(int(x * default_w + 0.5), int(y * default_h + 0.5)) for x,y in pose_2d_mpii])
-        visibilities.append(visibility)
+        pose_2d_mpii, visibility, newpose3d = pose_estimator.estimate(image)
+        #pose_2d_mpiis.append([(int(x * default_w + 0.5), int(y * default_h + 0.5)) for x,y in pose_2d_mpii])
+        #visibilities.append(visibility)
 
-    pose_2d_mpiis = np.array(pose_2d_mpiis)
-    visibilities = np.array(visibilities)
-    transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
-    pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
-    
+    #pose_2d_mpiis = np.array(pose_2d_mpiis)
+    #visibilities = np.array(visibilities)
+    #transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
+    #pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
+    print(newpose3d)
     #print 3d keypoints
-    pose_3dqt = np.array(pose_3d[0].transpose())
+    pose_3dqt = np.array(newpose3d[0]).transpose()
     for p in pose_3dqt:
         print(p)
 
-    #display_results(image, pose_2d_mpiis, visibilities, pose_3d)
+    #plot 3d points and show
+    for i, single_3d in enumerate(newpose3d):
+        plot_pose(single_3d)
+    plt.show()    
 
-    try:
-        import matplotlib.pyplot as plt
-
-        fig = plt.figure()
-        a = fig.add_subplot(2, 2, 1)
-        a.set_title("Result")
-        plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
-        '''bgimg = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_BGR2RGB)
-        bgimg = cv2.resize(
-            bgimg,
-            (e.heatMat.shape[1], e.heatMat.shape[0]),
-            interpolation=cv2.INTER_AREA,
-        )'''
-
-        # show network output
-        a = fig.add_subplot(2, 2, 2)
-        #plt.imshow(bgimg, alpha=0.5)
-        tmp = np.amax(e.heatMat[:, :, :-1], axis=2)
-        plt.imshow(tmp, cmap=plt.cm.gray, alpha=0.5)
-        plt.colorbar()
-
-        tmp2 = e.pafMat.transpose((2, 0, 1))
-        tmp2_odd = np.amax(np.absolute(tmp2[::2, :, :]), axis=0)
-        tmp2_even = np.amax(np.absolute(tmp2[1::2, :, :]), axis=0)
-
-        a = fig.add_subplot(2, 2, 3)
-        a.set_title("Vectormap-x")
-        # plt.imshow(CocoPose.get_bgimg(inp, target_size=(vectmap.shape[1], vectmap.shape[0])), alpha=0.5)
-        plt.imshow(tmp2_odd, cmap=plt.cm.gray, alpha=0.5)
-        plt.colorbar()
-
-        a = fig.add_subplot(2, 2, 4)
-        a.set_title("Vectormap-y")
-        # plt.imshow(CocoPose.get_bgimg(inp, target_size=(vectmap.shape[1], vectmap.shape[0])), alpha=0.5)
-        plt.imshow(tmp2_even, cmap=plt.cm.gray, alpha=0.5)
-        plt.colorbar()
-        #plt.show()
-
-        #plot 3d points and show
-        for i, single_3d in enumerate(pose_3d):
-            plot_pose(single_3d)
-        plt.show()
-
-    except Exception as e:
-        logger.warning("matplotlib error, %s" % e)
+    
     

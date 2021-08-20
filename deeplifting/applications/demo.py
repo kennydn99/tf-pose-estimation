@@ -54,12 +54,9 @@ def main():
         for p in pose_3dqt:
             data3dpoints.append([frameNum, "{:.2f}".format(p[0]), "{:.2f}".format(p[1]), "{:.2f}".format(p[2])])
             print(p)
-        
-        # Try to put 3d keypoints in csv file
-        #writeToCSV('3dkeypoints.csv', pose_3dqt)
 
         for x,y in bodypart_dict.items():
-            createCSV(1, y, pose_3dqt)
+            createCSV(y)
             addDataToCSV(y, data3dpoints[x])
 
         # Show 2D and 3D poses
@@ -70,26 +67,7 @@ def main():
     # close model
     pose_estimator.close()
 
-def writeToCSV(filename, pose_data3d):
-    """write 3d keypoints data to a csv file"""
-    header = ['Bodypart', 'X', 'Y', 'Z']
-    bodypart_name = [
-        "Bottom torso", "HipRight", "KneeRight", "FootRight",
-        "HipLeft", "KneeLeft", "FootLeft", "SpineMid",
-        "SpineShoulder", "NeckBase", "CenterHead", "ShoulderLeft",
-        "ElbowLeft", "WristLeft", "ShoulderRight", "ElbowRight", "WristRight"
-    ]
-    idx = 0
-    rows = []
-    with open(filename, 'w') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(header)
-        for data in pose_data3d:
-            rows.append([bodypart_name[idx], "{:.2f}".format(data[0]), "{:.2f}".format(data[1]), "{:.2f}".format(data[2])])
-            idx += 1
-        writer.writerows(rows)
-
-def createCSV(frameNum, filename, data3d):
+def createCSV(filename):
     header = ["Frame Number", 'X', 'Y', 'Z']
     with open(filename + '.csv', 'w') as f:
         w = csv.writer(f)

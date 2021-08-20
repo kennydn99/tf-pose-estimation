@@ -5,6 +5,7 @@ import math
 import cv2
 import numpy as np
 import csv
+import os
 
 from tf_pose import common
 from tf_pose.estimator import TfPoseEstimator
@@ -12,6 +13,7 @@ from tf_pose.networks import get_graph_path, model_wh
 
 from deeplifting.packages.lifting.utils.prob_model import Prob3dPose
 from deeplifting.applications.demo import createCSV, addDataToCSV
+from deeplifting.packages.lifting._pose_estimator import PoseEstimator
 
 logger = logging.getLogger("TfPoseEstimator-WebCam")
 logger.setLevel(logging.DEBUG)
@@ -88,8 +90,22 @@ if __name__ == "__main__":
         last = np.array(last)
         return [(first[0]+last[0])/2, (first[1]+last[1])/2]
 
+    #function to create csv files into csv directory
+    def createCSV(filename):
+        header = ["Frame Number", 'X', 'Y', 'Z']
+        with open("./CSV/" + filename + '.csv', 'w') as f:
+            w = csv.writer(f)
+            w.writerow(header)
+
+    #function to add data into existing csv file
+    def addDataToCSV(file, newdata):
+        with open("./CSV/" + file + '.csv', 'a') as f:
+            w = csv.writer(f)
+            w.writerow(newdata)
+
     #variables for getting 3d data
     poseLifting = Prob3dPose('./deeplifting/data/saved_sessions/prob_model/prob_model_params.mat')
+    
     #image_h, image_w = image.shape[:2]
     default_w = 640
     default_h = 480
@@ -105,15 +121,22 @@ if __name__ == "__main__":
         12:"ElbowLeft", 13:"WristLeft", 14:"ShoulderRight", 15:"ElbowRight", 16:"WristRight"
     }
     data3dpoints = []
-
+    
+    #make folder to store all csv files
+    try:
+        os.mkdir("./CSV")
+    except OSError as e:
+        print("The directory exists")
     #first create csv files for all body parts
-
+    for val in bodypart_dict.values():
+        createCSV(val)
+    
     #find total num of frames
     totalFrameNum = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(totalFrameNum)
     sample_rate = totalFrameNum/1
     fno = 0
     success, image = cam.read()
+    
     while success:
         if fno % sample_rate == 0:
             ret_val, image = cam.retrieve()
@@ -186,15 +209,17 @@ if __name__ == "__main__":
             visibilities = np.array(visibilities)
             transformed_pose2d, weights = poseLifting.transform_joints(pose_2d_mpiis, visibilities)
             pose_3d = poseLifting.compute_3d(transformed_pose2d, weights)
-            transposed_3dpoints = np.array(pose_3d[0].transpose())
+            transposed_3dpoints = np.array(pose_3d[0]).transpose()
             #change nparray back to list
             pose_2d_mpiis = pose_2d_mpiis.tolist()
             visibilities = visibilities.tolist()
 
-            #add transposed 3d data and current frame to 3d data list
+            #add transposed 3d data and current frame to 3d data list and update csv file
             for data in transposed_3dpoints:
                 data3dpoints.append([frameNum, "{:.2f}".format(data[0]), "{:.2f}".format(data[1]), "{:.2f}".format(data[2])])
-            print(frameNum)
+            for index, bodypart in bodypart_dict.items():
+                addDataToCSV(bodypart, data3dpoints[index])
+
             #clear lists
             pose_2d_mpiis.clear()
             visibilities.clear()
